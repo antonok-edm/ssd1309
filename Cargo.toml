@@ -1,0 +1,43 @@
+[package]
+authors = ["Anton Lazarev <https://antonok.com>", "James Waples <james@wapl.es>"]
+categories = ["embedded", "no-std"]
+description = "I2C/SPI driver for the SSD1309 OLED display controller"
+documentation = "https://docs.rs/ssd1309"
+exclude = ["readme_banner.jpg", "docs"]
+keywords = ["no-std", "ssd1309", "oled", "embedded", "embedded-hal-driver"]
+license = "MIT OR Apache-2.0"
+name = "ssd1309"
+readme = "README.md"
+version = "0.1.0"
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = [ "thumbv7m-none-eabi", "thumbv7em-none-eabihf" ]
+
+[dependencies]
+embedded-hal = "^ 0.2"
+
+[dependencies.embedded-graphics]
+optional = true
+version = "^ 0.6"
+
+[dev-dependencies]
+cortex-m = "^ 0.6"
+cortex-m-rt = "^ 0.6"
+panic-semihosting = "^ 0.5"
+
+[dev-dependencies.stm32f1xx-hal]
+version = "^ 0.4"
+features = [ "rt", "stm32f103" ]
+
+[features]
+default = ["graphics"]
+graphics = ["embedded-graphics"]
+[profile.dev]
+codegen-units = 1
+incremental = false
+
+[profile.release]
+codegen-units = 1
+debug = true
+lto = true
