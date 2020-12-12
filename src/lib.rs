@@ -18,7 +18,7 @@
 //! disp.set_pixel(10, 20, 1);
 //! ```
 //!
-//! See the [example](https://github.com/jamwaffles/ssd1309/blob/master/examples/graphics_i2c.rs)
+//! See the [example](https://github.com/antonok-edm/ssd1309/blob/master/examples/graphics.rs)
 //! for more usage. The [entire `embedded_graphics` featureset](https://github.com/jamwaffles/embedded-graphics#features)
 //! is supported by this driver.
 //!
@@ -28,7 +28,7 @@
 //! # Examples
 //!
 //! Examples can be found in
-//! [the examples/ folder](https://github.com/jamwaffles/ssd1309/blob/master/examples)
+//! [the examples/ folder](https://github.com/antonok-edm/ssd1309/blob/master/examples)
 //!
 //! ## Draw some text to the display
 //!
