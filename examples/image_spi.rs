@@ -26,6 +26,7 @@
 #![no_main]
 
 use cortex_m_rt::{entry, exception, ExceptionFrame};
+use display_interface_spi::SPIInterface;
 use embedded_graphics::{
     image::{Image, ImageRawLE},
     pixelcolor::BinaryColor,
@@ -69,12 +70,12 @@ fn main() -> ! {
         &mut rcc.apb2,
     );
 
-    let mut disp: GraphicsMode<_> = Builder::new().connect_spi(spi, dc, cs).into();
+    let spi_interface = SPIInterface::new(spi, dc, cs);
 
-    // If you aren't using the Chip Select pin, use this instead:
-    // let mut disp: GraphicsMode<_> = Builder::new()
-    //     .connect_spi(spi, dc, ssd1309::builder::NoOutputPin::new())
-    //     .into();
+    // If you don't need the Chip Select pin, use this instead:
+    // let spi_interface = SPIInterfaceNoCS::new(spi, dc);
+
+    let mut disp: GraphicsMode<_> = Builder::new().connect(spi_interface).into();
 
     disp.reset(&mut res, &mut delay).unwrap();
 

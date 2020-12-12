@@ -24,6 +24,7 @@
 #![no_main]
 
 use cortex_m_rt::{entry, exception, ExceptionFrame};
+use display_interface_i2c::I2CInterface;
 use embedded_graphics::{
     image::{Image, ImageRawLE},
     pixelcolor::BinaryColor,
@@ -73,10 +74,12 @@ fn main() -> ! {
         1000,
     );
 
+    let i2c_interface = I2CInterface::new(i2c, 0x3C, 0x40);
+
     let mut disp: GraphicsMode<_> = Builder::new()
         // Set initial rotation at 90 degrees clockwise
         .with_rotation(DisplayRotation::Rotate90)
-        .connect_i2c(i2c)
+        .connect(i2c_interface)
         .into();
 
     disp.reset(&mut res, &mut delay).unwrap();

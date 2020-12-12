@@ -1,4 +1,4 @@
-use super::interface::DisplayInterface;
+use display_interface::{DataFormat, DisplayError, WriteOnlyDataCommand};
 
 /// ssd1309 Commands
 
@@ -51,9 +51,9 @@ pub enum Command {
 
 impl Command {
     /// Send command to ssd1309
-    pub fn send<DI>(self, iface: &mut DI) -> Result<(), display_interface::DisplayError>
+    pub fn send<DI>(self, iface: &mut DI) -> Result<(), DisplayError>
     where
-        DI: DisplayInterface,
+        DI: WriteOnlyDataCommand,
     {
         // Transform command into a fixed size array of 7 u8 and the real length for sending
         let (data, len) = match self {
@@ -83,7 +83,7 @@ impl Command {
         };
 
         // Send command over the interface
-        iface.send_commands(display_interface::DataFormat::U8(&data[0..len]))
+        iface.send_commands(DataFormat::U8(&data[0..len]))
     }
 }
 

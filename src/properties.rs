@@ -1,8 +1,9 @@
 //! Container to store and set display properties
 
+use display_interface::{DataFormat, DisplayError, WriteOnlyDataCommand};
+
 use crate::{
     command::Command, displayrotation::DisplayRotation, displaysize::DisplaySize,
-    interface::DisplayInterface,
 };
 
 /// Display properties struct
@@ -18,7 +19,7 @@ pub struct DisplayProperties<DI> {
 
 impl<DI> DisplayProperties<DI>
 where
-    DI: DisplayInterface,
+    DI: WriteOnlyDataCommand,
 {
     /// Create new DisplayProperties instance
     pub fn new(
@@ -39,7 +40,7 @@ where
 
     /// Initialise the display in column mode (i.e. a byte walks down a column of 8 pixels) with
     /// column 0 on the left and column _(display_width - 1)_ on the right.
-    pub fn init_column_mode(&mut self) -> Result<(), display_interface::DisplayError> {
+    pub fn init_column_mode(&mut self) -> Result<(), DisplayError> {
         let display_rotation = self.display_rotation;
 
         Command::DisplayClockDiv(0xa, 0x0).send(&mut self.iface)?;
@@ -57,7 +58,7 @@ where
     /// Set the position in the framebuffer of the display where any sent data should be
     /// drawn. This method can be used for changing the affected area on the screen as well
     /// as (re-)setting the start point of the next `draw` call.
-    pub fn set_draw_area(&mut self, start: (u8, u8), end: (u8, u8)) -> Result<(), display_interface::DisplayError> {
+    pub fn set_draw_area(&mut self, start: (u8, u8), end: (u8, u8)) -> Result<(), DisplayError> {
         self.draw_area_start = start;
         self.draw_area_end = end;
         self.draw_column = start.0;
@@ -69,10 +70,10 @@ where
     /// Send the data to the display for drawing at the current position in the framebuffer
     /// and advance the position accordingly. Cf. `set_draw_area` to modify the affected area by
     /// this method.
-    pub fn draw(&mut self, mut buffer: &[u8]) -> Result<(), display_interface::DisplayError> {
+    pub fn draw(&mut self, mut buffer: &[u8]) -> Result<(), DisplayError> {
         while !buffer.is_empty() {
             let count = self.draw_area_end.0 - self.draw_column;
-            self.iface.send_data(display_interface::DataFormat::U8(&buffer[..count as usize]))?;
+            self.iface.send_data(DataFormat::U8(&buffer[..count as usize]))?;
             self.draw_column += count;
 
             if self.draw_column >= self.draw_area_end.0 {
@@ -92,7 +93,7 @@ where
         Ok(())
     }
 
-    fn send_draw_address(&mut self) -> Result<(), display_interface::DisplayError> {
+    fn send_draw_address(&mut self) -> Result<(), DisplayError> {
         Command::PageAddress(self.draw_row.into()).send(&mut self.iface)?;
         Command::ColumnAddressLow(0xF & self.draw_column).send(&mut self.iface)?;
         Command::ColumnAddressHigh(0xF & (self.draw_column >> 4)).send(&mut self.iface)
@@ -145,7 +146,7 @@ where
     }
 
     /// Set the display rotation
-    pub fn set_rotation(&mut self, display_rotation: DisplayRotation) -> Result<(), display_interface::DisplayError> {
+    pub fn set_rotation(&mut self, display_rotation: DisplayRotation) -> Result<(), DisplayError> {
         self.display_rotation = display_rotation;
 
         match display_rotation {
@@ -169,7 +170,7 @@ where
     }
 
     /// Set the display contrast
-    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), display_interface::DisplayError> {
+    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), DisplayError> {
         Command::Contrast(contrast).send(&mut self.iface)
     }
 }

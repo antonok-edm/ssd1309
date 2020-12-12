@@ -1,8 +1,8 @@
 //! Buffered display module for use with the [embedded_graphics] crate
 //!
 //! ```rust,ignore
-//! let i2c = /* I2C interface from your HAL of choice */;
-//! let display: GraphicsMode<_> = Builder::new().connect_i2c(i2c).into();
+//! let interface = /* your preferred `display-interface` implementor */;
+//! let display: GraphicsMode<_> = Builder::new().connect(interface).into();
 //! let image = include_bytes!("image_16x16.raw");
 //!
 //! display.init().unwrap();
@@ -15,11 +15,13 @@
 //! display.flush().unwrap();
 //! ```
 
+use display_interface::{DisplayError, WriteOnlyDataCommand};
 use hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
-    displayrotation::DisplayRotation, interface::DisplayInterface,
-    mode::displaymode::DisplayModeTrait, properties::DisplayProperties,
+    displayrotation::DisplayRotation,
+    mode::displaymode::DisplayModeTrait,
+    properties::DisplayProperties,
 };
 
 const BUFFER_SIZE: usize = 128 * 64 / 8;
@@ -27,7 +29,7 @@ const BUFFER_SIZE: usize = 128 * 64 / 8;
 /// Graphics mode handler
 pub struct GraphicsMode<DI>
 where
-    DI: DisplayInterface,
+    DI: WriteOnlyDataCommand,
 {
     properties: DisplayProperties<DI>,
     buffer: [u8; BUFFER_SIZE],
@@ -35,7 +37,7 @@ where
 
 impl<DI> DisplayModeTrait<DI> for GraphicsMode<DI>
 where
-    DI: DisplayInterface,
+    DI: WriteOnlyDataCommand,
 {
     /// Create new GraphicsMode instance
     fn new(properties: DisplayProperties<DI>) -> Self {
@@ -53,7 +55,7 @@ where
 
 impl<DI> GraphicsMode<DI>
 where
-    DI: DisplayInterface,
+    DI: WriteOnlyDataCommand,
 {
     /// Clear the display buffer. You need to call `disp.flush()` for any effect on the screen
     pub fn clear(&mut self) {
@@ -82,7 +84,7 @@ where
     }
 
     /// Write out data to display
-    pub fn flush(&mut self) -> Result<(), display_interface::DisplayError> {
+    pub fn flush(&mut self) -> Result<(), DisplayError> {
         let display_size = self.properties.get_size();
 
         // Ensure the display buffer is at the origin of the display before we send the full frame
@@ -151,7 +153,7 @@ where
 
     /// Display is set up in column mode, i.e. a byte walks down a column of 8 pixels from
     /// column 0 on the left, to column _n_ on the right
-    pub fn init(&mut self) -> Result<(), display_interface::DisplayError> {
+    pub fn init(&mut self) -> Result<(), DisplayError> {
         self.properties.init_column_mode()
     }
 
@@ -161,12 +163,12 @@ where
     }
 
     /// Set the display rotation
-    pub fn set_rotation(&mut self, rot: DisplayRotation) -> Result<(), display_interface::DisplayError> {
+    pub fn set_rotation(&mut self, rot: DisplayRotation) -> Result<(), DisplayError> {
         self.properties.set_rotation(rot)
     }
 
     /// Set the display contrast
-    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), display_interface::DisplayError> {
+    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), DisplayError> {
         self.properties.set_contrast(contrast)
     }
 }
@@ -185,9 +187,9 @@ use embedded_graphics::{
 #[cfg(feature = "graphics")]
 impl<DI> DrawTarget<BinaryColor> for GraphicsMode<DI>
 where
-    DI: DisplayInterface,
+    DI: WriteOnlyDataCommand,
 {
-    type Error = display_interface::DisplayError;
+    type Error = DisplayError;
 
     fn draw_pixel(&mut self, pixel: drawable::Pixel<BinaryColor>) -> Result<(), Self::Error> {
         let drawable::Pixel(pos, color) = pixel;
