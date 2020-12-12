@@ -8,7 +8,7 @@ keywords = ["no-std", "ssd1309", "oled", "embedded", "embedded-hal-driver"]
 license = "MIT OR Apache-2.0"
 name = "ssd1309"
 readme = "README.md"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2018"
 
 [package.metadata.docs.rs]
