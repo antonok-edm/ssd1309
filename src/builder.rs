@@ -101,7 +101,7 @@ impl Builder {
         I2C: hal::blocking::i2c::Write<Error = CommE>,
     {
         let properties = DisplayProperties::new(
-            I2cInterface::new(i2c, self.i2c_addr),
+            I2cInterface::new(i2c, self.i2c_addr, 0x40),
             self.display_size,
             self.rotation,
         );

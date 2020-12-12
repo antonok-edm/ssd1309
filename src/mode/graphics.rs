@@ -19,7 +19,7 @@ use hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
     displayrotation::DisplayRotation, interface::DisplayInterface,
-    mode::displaymode::DisplayModeTrait, properties::DisplayProperties, Error,
+    mode::displaymode::DisplayModeTrait, properties::DisplayProperties,
 };
 
 const BUFFER_SIZE: usize = 128 * 64 / 8;
@@ -67,22 +67,22 @@ where
         &mut self,
         rst: &mut RST,
         delay: &mut DELAY,
-    ) -> Result<(), Error<(), PinE>>
+    ) -> Result<(), PinE>
     where
         RST: OutputPin<Error = PinE>,
         DELAY: DelayMs<u8>,
     {
-        rst.set_high().map_err(Error::Pin)?;
+        rst.set_high()?;
         delay.delay_ms(10);
-        rst.set_low().map_err(Error::Pin)?;
+        rst.set_low()?;
         delay.delay_ms(10);
-        rst.set_high().map_err(Error::Pin)?;
+        rst.set_high()?;
         delay.delay_ms(10);
         Ok(())
     }
 
     /// Write out data to display
-    pub fn flush(&mut self) -> Result<(), DI::Error> {
+    pub fn flush(&mut self) -> Result<(), display_interface::DisplayError> {
         let display_size = self.properties.get_size();
 
         // Ensure the display buffer is at the origin of the display before we send the full frame
@@ -151,7 +151,7 @@ where
 
     /// Display is set up in column mode, i.e. a byte walks down a column of 8 pixels from
     /// column 0 on the left, to column _n_ on the right
-    pub fn init(&mut self) -> Result<(), DI::Error> {
+    pub fn init(&mut self) -> Result<(), display_interface::DisplayError> {
         self.properties.init_column_mode()
     }
 
@@ -161,12 +161,12 @@ where
     }
 
     /// Set the display rotation
-    pub fn set_rotation(&mut self, rot: DisplayRotation) -> Result<(), DI::Error> {
+    pub fn set_rotation(&mut self, rot: DisplayRotation) -> Result<(), display_interface::DisplayError> {
         self.properties.set_rotation(rot)
     }
 
     /// Set the display contrast
-    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), DI::Error> {
+    pub fn set_contrast(&mut self, contrast: u8) -> Result<(), display_interface::DisplayError> {
         self.properties.set_contrast(contrast)
     }
 }
@@ -187,7 +187,7 @@ impl<DI> DrawTarget<BinaryColor> for GraphicsMode<DI>
 where
     DI: DisplayInterface,
 {
-    type Error = DI::Error;
+    type Error = display_interface::DisplayError;
 
     fn draw_pixel(&mut self, pixel: drawable::Pixel<BinaryColor>) -> Result<(), Self::Error> {
         let drawable::Pixel(pos, color) = pixel;
