@@ -1,7 +1,7 @@
 [package]
 authors = ["Anton Lazarev <https://antonok.com>", "James Waples <james@wapl.es>"]
 categories = ["embedded", "no-std"]
-description = "I2C/SPI driver for the SSD1309 OLED display controller"
+description = "`display-interface` compatible driver for the SSD1309 OLED display controller"
 documentation = "https://docs.rs/ssd1309"
 exclude = ["readme_banner.jpg", "docs"]
 keywords = ["no-std", "ssd1309", "oled", "embedded", "embedded-hal-driver"]
