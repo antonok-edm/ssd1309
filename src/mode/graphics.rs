@@ -167,6 +167,12 @@ where
         self.properties.set_rotation(rot)
     }
 
+    /// Turn the display on or off. The display can be drawn to and retains all
+    /// of its memory even while off.
+    pub fn display_on(&mut self, on: bool) -> Result<(), DisplayError> {
+        self.properties.display_on(on)
+    }
+
     /// Set the display contrast
     pub fn set_contrast(&mut self, contrast: u8) -> Result<(), DisplayError> {
         self.properties.set_contrast(contrast)
