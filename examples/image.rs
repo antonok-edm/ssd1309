@@ -83,7 +83,7 @@ fn main() -> ! {
     disp.init().unwrap();
     disp.flush().unwrap();
 
-    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64, 64);
+    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64);
 
     Image::new(&im, Point::new(32, 0)).draw(&mut disp).unwrap();
 

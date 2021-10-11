@@ -22,8 +22,7 @@ use display_interface_i2c::I2CInterface;
 use embedded_graphics::{
     pixelcolor::BinaryColor,
     prelude::*,
-    primitives::{Circle, Line, Rectangle},
-    style::PrimitiveStyle,
+    primitives::{Circle, Line, PrimitiveStyle, Rectangle},
 };
 use panic_semihosting as _;
 use ssd1309::{prelude::*, Builder};
@@ -93,7 +92,7 @@ fn main() -> ! {
         .draw(&mut disp)
         .unwrap();
 
-    Rectangle::new(Point::new(48, 16), Point::new(48 + 16, 16 + 16))
+    Rectangle::new(Point::new(48, 16), Size::new(48 + 16, 16 + 16))
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 1))
         .draw(&mut disp)
         .unwrap();

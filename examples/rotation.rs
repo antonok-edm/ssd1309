@@ -93,7 +93,7 @@ fn main() -> ! {
 
     let (w, h) = disp.get_dimensions();
 
-    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64, 64);
+    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64);
 
     Image::new(
         &im,
