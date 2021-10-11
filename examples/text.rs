@@ -21,10 +21,10 @@
 use cortex_m_rt::{entry, exception, ExceptionFrame};
 use display_interface_i2c::I2CInterface;
 use embedded_graphics::{
-    mono_font::{ascii::FONT_5X8, MonoTextStyle},
+    mono_font::{ascii::FONT_5X8 as Font, MonoTextStyle},
     pixelcolor::BinaryColor,
     prelude::*,
-    text::Text,
+    text::{Baseline, Text},
 };
 use panic_semihosting as _;
 use ssd1309::{prelude::*, Builder};
@@ -79,13 +79,13 @@ fn main() -> ! {
     disp.init().unwrap();
     disp.flush().unwrap();
 
-    let style = MonoTextStyle::new(&FONT_5X8, BinaryColor::On);
+    let style = MonoTextStyle::new(&Font, BinaryColor::On);
 
-    Text::new("Hello world!", Point::zero(), style)
+    Text::with_baseline("Hello world!", Point::zero(), style, Baseline::Top)
         .draw(&mut disp)
         .unwrap();
 
-    Text::new("Hello Rust!", Point::new(0, 16), style)
+    Text::with_baseline("Hello Rust!", Point::new(0, 16), style, Baseline::Top)
         .draw(&mut disp)
         .unwrap();
 
