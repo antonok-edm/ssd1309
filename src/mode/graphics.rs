@@ -19,8 +19,7 @@ use display_interface::{DisplayError, WriteOnlyDataCommand};
 use hal::{blocking::delay::DelayMs, digital::v2::OutputPin};
 
 use crate::{
-    displayrotation::DisplayRotation,
-    mode::displaymode::DisplayModeTrait,
+    displayrotation::DisplayRotation, mode::displaymode::DisplayModeTrait,
     properties::DisplayProperties,
 };
 
@@ -65,11 +64,7 @@ where
     /// Reset display. This is very important on the SSD1309!
     ///
     /// This should be called before `init` or any other methods.
-    pub fn reset<RST, DELAY, PinE>(
-        &mut self,
-        rst: &mut RST,
-        delay: &mut DELAY,
-    ) -> Result<(), PinE>
+    pub fn reset<RST, DELAY, PinE>(&mut self, rst: &mut RST, delay: &mut DELAY) -> Result<(), PinE>
     where
         RST: OutputPin<Error = PinE>,
         DELAY: DelayMs<u8>,
@@ -181,37 +176,44 @@ where
 
 #[cfg(feature = "graphics")]
 use embedded_graphics::{
-    drawable,
+    draw_target::DrawTarget,
     geometry::Size,
     pixelcolor::{
         raw::{RawData, RawU1},
         BinaryColor,
     },
-    DrawTarget,
+    prelude::*,
 };
 
 #[cfg(feature = "graphics")]
-impl<DI> DrawTarget<BinaryColor> for GraphicsMode<DI>
+impl<DI> DrawTarget for GraphicsMode<DI>
 where
     DI: WriteOnlyDataCommand,
 {
+    type Color = BinaryColor;
     type Error = DisplayError;
 
-    fn draw_pixel(&mut self, pixel: drawable::Pixel<BinaryColor>) -> Result<(), Self::Error> {
-        let drawable::Pixel(pos, color) = pixel;
-
-        // Guard against negative values. All positive i32 values from `pos` can be represented in
-        // the `u32`s that `set_pixel()` accepts...
-        if pos.x < 0 || pos.y < 0 {
-            return Ok(());
+    fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+    where
+        I: IntoIterator<Item = Pixel<Self::Color>>,
+    {
+        for Pixel(pos, color) in pixels.into_iter() {
+            // Guard against negative values. All positive i32 values from `pos` can be represented in
+            // the `u32`s that `set_pixel()` accepts...
+            if pos.x >= 0 && pos.y >= 0 {
+                self.set_pixel(pos.x as u32, pos.y as u32, RawU1::from(color).into_inner());
+            }
         }
-
-        // ... which makes the `as` coercions here safe.
-        self.set_pixel(pos.x as u32, pos.y as u32, RawU1::from(color).into_inner());
 
         Ok(())
     }
+}
 
+#[cfg(feature = "graphics")]
+impl<DI> OriginDimensions for GraphicsMode<DI>
+where
+    DI: WriteOnlyDataCommand,
+{
     fn size(&self) -> Size {
         let (w, h) = self.get_dimensions();
 
