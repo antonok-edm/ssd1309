@@ -92,7 +92,7 @@ fn main() -> ! {
         .draw(&mut disp)
         .unwrap();
 
-    Rectangle::new(Point::new(48, 16), Size::new(48 + 16, 16 + 16))
+    Rectangle::new(Point::new(48, 16), Size::new(16, 16))
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 1))
         .draw(&mut disp)
         .unwrap();
