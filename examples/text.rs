@@ -1,5 +1,5 @@
 //! Print "Hello world!" with "Hello rust!" underneath. Uses the `embedded_graphics` crate to draw
-//! the text with a 6x8 pixel font.
+//! the text with a 6x10 pixel font.
 //!
 //! This example is for the STM32F103 "Blue Pill" board using I2C1.
 //!
@@ -21,10 +21,10 @@
 use cortex_m_rt::{entry, exception, ExceptionFrame};
 use display_interface_i2c::I2CInterface;
 use embedded_graphics::{
-    fonts::{Font6x8, Text},
+    mono_font::{ascii::FONT_6X10, MonoTextStyleBuilder},
     pixelcolor::BinaryColor,
     prelude::*,
-    style::TextStyle,
+    text::{Baseline, Text},
 };
 use panic_semihosting as _;
 use ssd1309::{prelude::*, Builder};
@@ -59,7 +59,7 @@ fn main() -> ! {
         (scl, sda),
         &mut afio.mapr,
         Mode::Fast {
-            frequency: 400_000,
+            frequency: 100_000,
             duty_cycle: DutyCycle::Ratio2to1,
         },
         clocks,
@@ -79,13 +79,16 @@ fn main() -> ! {
     disp.init().unwrap();
     disp.flush().unwrap();
 
-    Text::new("Hello world!", Point::zero())
-        .into_styled(TextStyle::new(Font6x8, BinaryColor::On))
+    let text_style = MonoTextStyleBuilder::new()
+        .font(&FONT_6X10)
+        .text_color(BinaryColor::On)
+        .build();
+
+    Text::with_baseline("Hello world!", Point::zero(), text_style, Baseline::Top)
         .draw(&mut disp)
         .unwrap();
 
-    Text::new("Hello Rust!", Point::new(0, 16))
-        .into_styled(TextStyle::new(Font6x8, BinaryColor::On))
+    Text::with_baseline("Hello Rust!", Point::new(0, 16), text_style, Baseline::Top)
         .draw(&mut disp)
         .unwrap();
 
