@@ -63,7 +63,7 @@ fn main() -> ! {
         (scl, sda),
         &mut afio.mapr,
         Mode::Fast {
-            frequency: 400_000,
+            frequency: 100_000,
             duty_cycle: DutyCycle::Ratio2to1,
         },
         clocks,
@@ -83,7 +83,7 @@ fn main() -> ! {
     disp.init().unwrap();
     disp.flush().unwrap();
 
-    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64, 64);
+    let im: ImageRawLE<BinaryColor> = ImageRawLE::new(include_bytes!("./rust.raw"), 64);
 
     Image::new(&im, Point::new(32, 0)).draw(&mut disp).unwrap();
 
