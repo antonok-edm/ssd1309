@@ -113,13 +113,12 @@ where
     ///# let interface = StubInterface;
     /// use ssd1309::prelude::*;
     ///
-    ///# let interface = FakeInterface {};
-    /// let rotated_disp = DisplayProperties::new(
-    ///     interface,
-    ///     DisplaySize::Display128x64,
-    ///     DisplayRotation::Rotate90,
-    /// );
-    /// assert_eq!(rotated_disp.get_dimensions(), (64, 128));
+    /// let mut display: GraphicsMode<_> = ssd1309::Builder::new().connect(interface).into();
+    /// assert_eq!(display.get_dimensions(), (128, 64));
+    ///
+    /// # let interface = StubInterface;
+    /// let mut rotated_display: GraphicsMode<_> = ssd1309::Builder::new().with_rotation(DisplayRotation::Rotate90).connect(interface).into();
+    /// assert_eq!(rotated_display.get_dimensions(), (64, 128));
     /// ```
     pub fn get_dimensions(&self) -> (u8, u8) {
         let (w, h) = self.display_size.dimensions();
