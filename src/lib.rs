@@ -44,8 +44,7 @@
 //! extern crate panic_semihosting;
 //! extern crate ssd1309;
 //! extern crate stm32f1xx_hal as blue_pill;
-//! 
-//! 
+//!
 //! use blue_pill::pac::Peripherals;
 //! use blue_pill::i2c::{DutyCycle, BlockingI2c, Mode};
 //! use blue_pill::prelude::*;
@@ -122,7 +121,5 @@ mod displaysize;
 pub mod mode;
 pub mod prelude;
 pub mod properties;
-#[doc(hidden)]
-pub mod test_helpers;
 
 pub use crate::builder::{Builder, NoOutputPin};
