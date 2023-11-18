@@ -34,46 +34,56 @@
 //!
 //! Uses [mode::GraphicsMode] and [embedded_graphics](../embedded_graphics/index.html).
 //!
-//! ```rust,no-run
+//! ```rust,no_run
 //! #![no_std]
+//! #![no_main]
 //!
 //! extern crate cortex_m;
 //! extern crate embedded_graphics;
 //! extern crate embedded_hal as hal;
-//! extern crate panic_abort;
+//! extern crate panic_semihosting;
 //! extern crate ssd1309;
-//! extern crate stm32f103xx_hal as blue_pill;
+//! extern crate stm32f1xx_hal as blue_pill;
 //!
-//! use blue_pill::delay::Delay;
-//! use blue_pill::i2c::{DutyCycle, I2c, Mode};
+//! use blue_pill::pac::Peripherals;
+//! use blue_pill::i2c::{DutyCycle, BlockingI2c, Mode};
 //! use blue_pill::prelude::*;
 //! use display_interface_i2c::I2CInterface;
-//! use embedded_graphics::fonts::Font6x8;
-//! use embedded_graphics::prelude::*;
+//! use embedded_graphics::{
+//!     mono_font::{ascii::FONT_5X8, MonoTextStyle},
+//!        pixelcolor::BinaryColor,
+//!        prelude::*,
+//!        text::Text,
+//!    };
+//! use panic_semihosting as _;
 //! use ssd1309::{mode::GraphicsMode, Builder};
 //!
 //! fn main() {
-//!     let dp = blue_pill::stm32f103xx::Peripherals::take().unwrap();
+//!     let dp = blue_pill::pac::Peripherals::take().unwrap();
+//!     let cp = cortex_m::Peripherals::take().unwrap();
 //!     let mut flash = dp.FLASH.constrain();
 //!     let mut rcc = dp.RCC.constrain();
 //!     let clocks = rcc.cfgr.freeze(&mut flash.acr);
-//!     let mut afio = dp.AFIO.constrain(&mut rcc.apb2);
-//!     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+//!     let mut afio = dp.AFIO.constrain();
+//!     let mut gpiob = dp.GPIOB.split();
 //!     let scl = gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh);
 //!     let sda = gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh);
 //!     let mut res = gpiob.pb7.into_push_pull_output(&mut gpiob.crl);
-//!     let mut delay = Delay::new(cp.SYST, clocks);
+//!     let mut delay = cp.SYST.delay(&clocks);
 //!
-//!     let i2c = I2c::i2c1(
+//!     let i2c = BlockingI2c::i2c1(
 //!         dp.I2C1,
 //!         (scl, sda),
 //!         &mut afio.mapr,
 //!         Mode::Fast {
-//!             frequency: 400_000,
-//!             duty_cycle: DutyCycle::Ratio1to1,
+//!             frequency: 100u32.kHz(),
+//!             duty_cycle: DutyCycle::Ratio2to1,
 //!         },
 //!         clocks,
-//!         &mut rcc.apb1,
+//!         1000,
+//!         10,
+//!         1000,
+//!         1000,
 //!     );
 //!
 //!     let i2c_interface = I2CInterface::new(i2c, 0x3C, 0x40);
@@ -83,12 +93,11 @@
 //!     disp.reset(&mut res, &mut delay).unwrap();
 //!     disp.init().unwrap();
 //!     disp.flush().unwrap();
-//!     disp.draw(Font6x8::render_str("Hello world!", 1u8.into()).into_iter());
-//!     disp.draw(
-//!         Font6x8::render_str("Hello Rust!")
-//!             .translate(Coord::new(0, 16))
-//!             .into_iter(),
-//!     );
+//! 
+//!     let style = MonoTextStyle::new(&FONT_5X8, BinaryColor::On);
+//!
+//!     Text::new("Hello world!", Point::new(0, 0), style).draw(&mut disp).unwrap();
+//!     Text::new("Hello Rust!", Point::new(0, 16), style).draw(&mut disp).unwrap();
 //!     disp.flush().unwrap();
 //! }
 //! ```

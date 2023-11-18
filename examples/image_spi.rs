@@ -43,13 +43,13 @@ fn main() -> ! {
     let cp = cortex_m::Peripherals::take().unwrap();
 
     let mut flash = dp.FLASH.constrain();
-    let mut rcc = dp.RCC.constrain();
+    let rcc = dp.RCC.constrain();
 
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
 
-    let mut afio = dp.AFIO.constrain(&mut rcc.apb2);
+    let mut afio = dp.AFIO.constrain();
 
-    let mut gpioa = dp.GPIOA.split(&mut rcc.apb2);
+    let mut gpioa = dp.GPIOA.split();
 
     let mut res = gpioa.pa4.into_push_pull_output(&mut gpioa.crl);
     let sck = gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl);
@@ -58,16 +58,15 @@ fn main() -> ! {
     let dc = gpioa.pa2.into_push_pull_output(&mut gpioa.crl);
     let cs = gpioa.pa1.into_push_pull_output(&mut gpioa.crl);
 
-    let mut delay = stm32f1xx_hal::delay::Delay::new(cp.SYST, clocks);
+    let mut delay = cp.SYST.delay(&clocks);
 
     let spi = Spi::spi1(
         dp.SPI1,
         (sck, miso, mosi),
         &mut afio.mapr,
         spi::MODE_0,
-        400.khz(),
+        400u32.kHz(),
         clocks,
-        &mut rcc.apb2,
     );
 
     let spi_interface = SPIInterface::new(spi, dc, cs);
@@ -92,6 +91,6 @@ fn main() -> ! {
 }
 
 #[exception]
-fn HardFault(ef: &ExceptionFrame) -> ! {
+unsafe fn HardFault(ef: &ExceptionFrame) -> ! {
     panic!("{:#?}", ef);
 }

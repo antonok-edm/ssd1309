@@ -107,29 +107,18 @@ where
     /// Get display dimensions, taking into account the current rotation of the display
     ///
     /// ```rust
-    /// # struct FakeInterface;
-    /// #
-    /// # impl DisplayInterface for FakeInterface {
-    /// #     fn send_command(&mut self, cmd: u8) -> Result<(), ()> { Ok(()) }
-    /// #     fn send_data(&mut self, buf: &[u8]) -> Result<(), ()> { Ok(()) }
-    /// # }
-    /// #
-    /// # let interface = FakeInterface {};
-    /// #
-    /// let disp = DisplayProperties::new(
-    ///     interface,
-    ///     DisplaySize::Display128x64,
-    ///     DisplayRotation::Rotate0,
-    /// );
-    /// assert_eq!(disp.get_dimensions(), (128, 64));
+    ///# #[path = "test_helpers.rs"]
+    ///# mod test_helpers;
+    ///# use test_helpers::StubInterface;
+    ///# let interface = StubInterface;
+    /// use ssd1309::prelude::*;
     ///
-    /// # let interface = FakeInterface {};
-    /// let rotated_disp = DisplayProperties::new(
-    ///     interface,
-    ///     DisplaySize::Display128x64,
-    ///     DisplayRotation::Rotate90,
-    /// );
-    /// assert_eq!(rotated_disp.get_dimensions(), (64, 128));
+    /// let mut display: GraphicsMode<_> = ssd1309::Builder::new().connect(interface).into();
+    /// assert_eq!(display.get_dimensions(), (128, 64));
+    ///
+    /// # let interface = StubInterface;
+    /// let mut rotated_display: GraphicsMode<_> = ssd1309::Builder::new().with_rotation(DisplayRotation::Rotate90).connect(interface).into();
+    /// assert_eq!(rotated_display.get_dimensions(), (64, 128));
     /// ```
     pub fn get_dimensions(&self) -> (u8, u8) {
         let (w, h) = self.display_size.dimensions();

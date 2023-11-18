@@ -9,8 +9,8 @@ keywords = ["no-std", "ssd1309", "oled", "embedded", "embedded-hal-driver"]
 license = "MIT OR Apache-2.0"
 name = "ssd1309"
 readme = "README.md"
-version = "0.3.0"
-edition = "2018"
+version = "0.4.0"
+edition = "2021"
 
 [package.metadata.docs.rs]
 targets = [ "thumbv7m-none-eabi", "thumbv7em-none-eabihf" ]
@@ -18,18 +18,18 @@ targets = [ "thumbv7m-none-eabi", "thumbv7em-none-eabihf" ]
 [dependencies]
 embedded-hal = "^ 0.2"
 display-interface = "^ 0.4"
-embedded-graphics-core = { version = "^ 0.3", optional = true }
+embedded-graphics-core = { version = "^ 0.4", optional = true }
 
 [dev-dependencies]
-cortex-m = "^ 0.6"
-cortex-m-rt = "^ 0.6"
-embedded-graphics = "^ 0.7"
-panic-semihosting = "^ 0.5"
+cortex-m = "^ 0.7"
+cortex-m-rt = "^ 0.7"
+embedded-graphics = "^ 0.8"
+panic-semihosting = "^ 0.6"
 display-interface-i2c = "^ 0.4"
 display-interface-spi = "^ 0.4"
 
 [dev-dependencies.stm32f1xx-hal]
-version = "^ 0.4"
+version = "^ 0.10"
 features = [ "rt", "stm32f103" ]
 
 [features]
