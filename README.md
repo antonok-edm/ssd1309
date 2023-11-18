@@ -18,6 +18,8 @@ The `GraphicsMode::reset` method is a good way to ensure this is accomplished.
 
 Check the [documentation](https://docs.rs/ssd1309) and [examples](examples/).
 
+Also available are third-party examples using the [Cortex-M4F LaunchPad (TM4C123G)](https://github.com/HerrMuellerluedenscheid/tm4c-oled-example) and the [Raspberry Pi Pico (RP2040)](https://github.com/HerrMuellerluedenscheid/rp2040-oled-1309-spi).
+
 ## License
 
 Licensed under either of
